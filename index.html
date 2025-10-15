@@ -97,76 +97,11 @@
     </div>
   </div>
 
-  <!-- 人身：負傷者（修正） -->
-  <div class="card" id="injuryBlock">
-    <div class="grid">
-      <div class="g-12"><strong>【負傷者】</strong></div>
-
-      <!-- 1人目 -->
-      <div class="g-6">
-        <label>１．第当事者の区分</label>
-        <div class="row">
-          <select id="inj1_role">
-            <option>運転手</option>
-            <option>同乗者</option>
-            <option>歩行者</option>
-            <option>自転車運転者</option>
-            <option>自転車同乗者</option>
-            <option>二輪運転者</option>
-            <option>二輪同乗者</option>
-            <option>その他</option>
-          </select>
-          <input id="inj1_seat" placeholder="同乗者の場合：前席／後席右 など" style="display:none;flex:1 1 220px"/>
-        </div>
-        <label style="margin-top:8px">怪我の程度</label>
-        <div class="row">
-          <select id="inj1_degree_sel">
-            <option value="">（選択）</option>
-            <option>死亡</option>
-            <option>重傷（骨折・内臓損傷 等）</option>
-            <option>中等傷（打撲・挫傷で要治療）</option>
-            <option>軽傷（擦過・軽打撲 等）</option>
-            <option>不明／申告のみ</option>
-            <option>その他</option>
-          </select>
-          <input id="inj1_degree_other" placeholder="その他の具体（任意）" style="display:none;flex:1 1 220px">
-        </div>
-      </div>
-
-      <!-- 2人目（第一当事者） -->
-      <div class="g-6">
-        <label>２．第一当事者の怪我の程度</label>
-        <div class="row">
-          <select id="inj2_degree_sel">
-            <option value="">（選択）</option>
-            <option>死亡</option>
-            <option>重傷（骨折・内臓損傷 等）</option>
-            <option>中等傷（打撲・挫傷で要治療）</option>
-            <option>軽傷（擦過・軽打撲 等）</option>
-            <option>不明／申告のみ</option>
-            <option>その他</option>
-          </select>
-          <input id="inj2_degree_other" placeholder="その他の具体（任意）" style="display:none;flex:1 1 220px">
-        </div>
-      </div>
-
-      <!-- 共通の搬送欄（1つだけ） -->
-      <div class="g-12">
-        <label>搬送（共通）</label>
-        <div class="row">
-          <select id="trans_method">
-            <option>なし</option><option>自己受診</option><option>救急搬送</option><option>ドクターヘリ</option>
-          </select>
-          <input id="trans_hospital" placeholder="搬送先（任意）" style="flex:1 1 300px">
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 当事者（共通） -->
+  <!-- 第一当事者 -->
   <div class="card">
     <div class="grid">
       <div class="g-12"><strong>【第一当事者】</strong></div>
+
       <div class="g-6"><label>氏　　名</label><input id="a_name"></div>
       <div class="g-3"><label>年　　齢</label><input id="a_age" type="number" min="0" inputmode="numeric"></div>
       <div class="g-3"><label>住　　所</label><input id="a_addr" placeholder="市区町村〜番地"></div>
@@ -177,12 +112,46 @@
 
       <div class="g-4"><label>破損状況</label><input id="a_damage"></div>
       <div class="g-8"><label id="a_stmt_label">供述調書（人身）／申し立て（物件）</label><textarea id="a_stmt"></textarea></div>
+
+      <!-- ←ここに負傷情報（第一当事者専用） -->
+      <div class="g-4"><label>区　　分</label>
+        <div class="row">
+          <select id="a_role">
+            <option>運転手</option><option>同乗者</option><option>歩行者</option>
+            <option>自転車運転者</option><option>自転車同乗者</option>
+            <option>二輪運転者</option><option>二輪同乗者</option><option>その他</option>
+          </select>
+          <input id="a_seat" placeholder="同乗者：前席／後席右 など" style="display:none;flex:1 1 220px">
+        </div>
+      </div>
+      <div class="g-4"><label>怪我の程度</label>
+        <div class="row">
+          <select id="a_injury_sel">
+            <option value="">（選択）</option><option>死亡</option>
+            <option>重傷（骨折・内臓損傷 等）</option>
+            <option>中等傷（打撲・挫傷で要治療）</option>
+            <option>軽傷（擦過・軽打撲 等）</option>
+            <option>不明／申告のみ</option><option>その他</option>
+          </select>
+          <input id="a_injury_other" placeholder="その他の具体（任意）" style="display:none;flex:1 1 220px">
+        </div>
+      </div>
+      <div class="g-4"><label>搬送</label>
+        <div class="row">
+          <select id="a_trans_method">
+            <option>なし</option><option>自己受診</option><option>救急搬送</option><option>ドクターヘリ</option>
+          </select>
+          <input id="a_trans_hospital" placeholder="搬送先（任意）" style="flex:1 1 220px">
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- 第二当事者 -->
   <div class="card">
     <div class="grid">
       <div class="g-12"><strong>【第二当事者】</strong></div>
+
       <div class="g-6"><label>氏　　名</label><input id="b_name"></div>
       <div class="g-3"><label>年　　齢</label><input id="b_age" type="number" min="0" inputmode="numeric"></div>
       <div class="g-3"><label>住　　所</label><input id="b_addr" placeholder="市区町村〜番地"></div>
@@ -193,10 +162,42 @@
 
       <div class="g-4"><label>破損状況</label><input id="b_damage"></div>
       <div class="g-8"><label id="b_stmt_label">供述調書（人身）／申し立て（物件）</label><textarea id="b_stmt"></textarea></div>
+
+      <!-- ←ここに負傷情報（第二当事者専用） -->
+      <div class="g-4"><label>区　　分</label>
+        <div class="row">
+          <select id="b_role">
+            <option>運転手</option><option>同乗者</option><option>歩行者</option>
+            <option>自転車運転者</option><option>自転車同乗者</option>
+            <option>二輪運転者</option><option>二輪同乗者</option><option>その他</option>
+          </select>
+          <input id="b_seat" placeholder="同乗者：前席／後席右 など" style="display:none;flex:1 1 220px">
+        </div>
+      </div>
+      <div class="g-4"><label>怪我の程度</label>
+        <div class="row">
+          <select id="b_injury_sel">
+            <option value="">（選択）</option><option>死亡</option>
+            <option>重傷（骨折・内臓損傷 等）</option>
+            <option>中等傷（打撲・挫傷で要治療）</option>
+            <option>軽傷（擦過・軽打撲 等）</option>
+            <option>不明／申告のみ</option><option>その他</option>
+          </select>
+          <input id="b_injury_other" placeholder="その他の具体（任意）" style="display:none;flex:1 1 220px">
+        </div>
+      </div>
+      <div class="g-4"><label>搬送</label>
+        <div class="row">
+          <select id="b_trans_method">
+            <option>なし</option><option>自己受診</option><option>救急搬送</option><option>ドクターヘリ</option>
+          </select>
+          <input id="b_trans_hospital" placeholder="搬送先（任意）" style="flex:1 1 220px">
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- 実況見分調書 文章（人身のみ） -->
+  <!-- 実況見分調書（人身のみ） -->
   <div class="card" id="jikkouNote">
     <div class="grid">
       <div class="g-12"><strong>【実況見分調書】</strong></div>
@@ -220,7 +221,7 @@
     </div>
   </div>
 
-  <!-- 操作 -->
+  <!-- 操作（記入例ボタン） -->
   <div class="card no-print">
     <div class="btns">
       <button class="primary" id="btnPreview">プレビュー/印刷</button>
@@ -229,6 +230,16 @@
       <button id="btnJSON">JSONを書き出し</button>
       <button id="btnMD">Markdownをコピー</button>
       <button id="btnPNG">PNGを書き出し</button>
+      <span class="hr" style="width:1px;height:28px"></span>
+      <label class="help">記入例：</label>
+      <select id="demoSelect">
+        <option value="injuryRear">人身：追突（軽傷）</option>
+        <option value="injuryDoorBike">人身：ドア開放×自転車（中等傷）</option>
+        <option value="propertyHitRun">物件：当て逃げ（駐車場）</option>
+      </select>
+      <button id="btnDemoApply">適用</button>
+      <button id="btnDemoRandom">ランダム</button>
+      <button id="btnDemoClear">例をクリア</button>
     </div>
   </div>
 
@@ -242,14 +253,16 @@
   const $ = (q)=>document.querySelector(q);
   const FIELDS = [
     'reportType','affName','inspector','assistant','tReport','tStart','tEnd','tOccur','place','roadType','accType','accTypeOther','accDetail',
-    'inj1_role','inj1_seat','inj1_degree_sel','inj1_degree_other',
-    'inj2_degree_sel','inj2_degree_other',
-    'trans_method','trans_hospital',
+    // 第一当事者
     'a_name','a_age','a_addr','a_type','a_pass','a_car','a_damage','a_stmt',
+    'a_role','a_seat','a_injury_sel','a_injury_other','a_trans_method','a_trans_hospital',
+    // 第二当事者
     'b_name','b_age','b_addr','b_type','b_pass','b_car','b_damage','b_stmt',
+    'b_role','b_seat','b_injury_sel','b_injury_other','b_trans_method','b_trans_hospital',
+    // 見分メモ
     'jikkou'
   ];
-  const LSKEY='iwamatsu_accident_report_v4';
+  const LSKEY='iwamatsu_accident_report_v6';
   const IMGKEY='iwamatsu_accident_images_v1';
   let images=[];
 
@@ -259,38 +272,40 @@
   function esc(s){ return String(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
   function nl2br(s){ return String(s||'').replace(/\n/g,'<br>'); }
 
-  // 表示切替
+  // 表示切り替え
   function toggleAccOther(){ $('#accTypeOther').style.display = ($('#accType').value==='その他') ? 'block' : 'none'; }
-  function toggleInjuryOther(){
-    $('#inj1_degree_other').style.display = ($('#inj1_degree_sel').value==='その他') ? 'block' : 'none';
-    $('#inj2_degree_other').style.display = ($('#inj2_degree_sel').value==='その他') ? 'block' : 'none';
-  }
   function toggleSeat(){
-    const show = $('#inj1_role').value==='同乗者';
-    $('#inj1_seat').style.display = show ? 'block' : 'none';
+    $('#a_seat').style.display = ($('#a_role').value==='同乗者')?'block':'none';
+    $('#b_seat').style.display = ($('#b_role').value==='同乗者')?'block':'none';
+  }
+  function toggleInjuryOther(){
+    $('#a_injury_other').style.display = ($('#a_injury_sel').value==='その他')?'block':'none';
+    $('#b_injury_other').style.display = ($('#b_injury_sel').value==='その他')?'block':'none';
   }
   function injuryText(sel, other){ const v=(sel||'').trim(); return (v==='その他')?(other||'').trim():v||''; }
 
   function toObj(){
     const o={}; FIELDS.forEach(k=>{ const el=$('#'+k); o[k]=el?.value??''; });
     o.accTypeFinal = ($('#accType').value==='その他' && o.accTypeOther) ? o.accTypeOther : ($('#accType').value || '');
-    o.inj1_degree = injuryText(o.inj1_degree_sel, o.inj1_degree_other);
-    o.inj2_degree = injuryText(o.inj2_degree_sel, o.inj2_degree_other);
+    // inj text
+    o.a_injury = injuryText(o.a_injury_sel, o.a_injury_other);
+    o.b_injury = injuryText(o.b_injury_sel, o.b_injury_other);
     o.docId=$('#docId').textContent.replace('ID: ',''); o.images=images;
     return o;
   }
   function applyObj(o){
     FIELDS.forEach(k=>{ if($('#'+k)) $('#'+k).value=o[k]??''; });
     images=Array.isArray(o.images)?o.images:[];
-    toggleByType(); toggleAccOther(); toggleInjuryOther(); toggleSeat(); renderThumbs();
+    toggleByType(); toggleAccOther(); toggleSeat(); toggleInjuryOther(); renderThumbs();
   }
+
   function saveDraft(){ localStorage.setItem(LSKEY, JSON.stringify(toObj())); alert('下書きを保存しました'); }
   function loadDraft(){ const raw=localStorage.getItem(LSKEY); if(!raw) return alert('保存はありません'); const o=JSON.parse(raw); applyObj(o); $('#docId').textContent='ID: '+(o.docId||genId()); alert('読み込みました'); }
   function exportJSON(){ const o=toObj(); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(o,null,2)],{type:'application/json'})); a.download=`${o.docId}.json`; a.click(); URL.revokeObjectURL(a.href); }
 
   function toMarkdown(o){
     const type = o.reportType==='property' ? '物件交通事故報告書' : '人身交通事故報告書';
-    const baseTop =
+    const head =
 `# ${type}（${o.docId}）\n
 所属氏名：${o.affName||''}
 見  分  官：${o.inspector||''}
@@ -305,41 +320,25 @@
 事故形態：${o.accTypeFinal||''}
 事故状況：${o.accDetail||''}
 `;
-
-    const injBlock = (o.reportType==='property') ? '' :
-`【負傷者】
-１．第当事者の区分：${o.inj1_role||''}${o.inj1_role==='同乗者' && o.inj1_seat?`（${o.inj1_seat}）`:''}
-　怪我の程度（${o.inj1_degree||''}）
-２．第一当事者の怪我の程度（${o.inj2_degree||''}）
-搬送（共通）：${o.trans_method||''}／搬送先：${o.trans_hospital||''}
-
-【実況見分調書】
-${o.jikkou||'本件交通事故の状況を明らかにするため、本職が撮影した写真　枚及び見分結果の図面を添付する。'}
-`;
-
     const partyA =
 `【第一当事者】
-氏　　名：${o.a_name||''}
-年　　齢：${o.a_age||''}
-住　　所：${o.a_addr||''}
-${o.reportType==='property' ? `種　　別：${o.a_type||''}\n` : ''}同乗者名：${o.a_pass||''}
-車　　名：${o.a_car||''}
-破損状況：${o.a_damage||''}
+氏　　名：${o.a_name||''}／年齢：${o.a_age||''}／住所：${o.a_addr||''}
+${o.reportType==='property' ? `種別：${o.a_type||''}\n` : ''}同乗者名：${o.a_pass||''}／車名：${o.a_car||''}／破損：${o.a_damage||''}
+区分：${o.a_role||''}${o.a_role==='同乗者'&&o.a_seat?`（${o.a_seat}）`:''}
+怪我：${o.a_injury||''}　搬送：${o.a_trans_method||''}／搬送先：${o.a_trans_hospital||''}
 ${o.reportType==='property' ? `申し立て：${o.a_stmt||''}` : `供述調書：${o.a_stmt||''}`}
 `;
-
     const partyB =
 `【第二当事者】
-氏　　名：${o.b_name||''}
-年　　齢：${o.b_age||''}
-住　　所：${o.b_addr||''}
-${o.reportType==='property' ? `種　　別：${o.b_type||''}\n` : ''}同乗者名：${o.b_pass||''}
-車　　名：${o.b_car||''}
-破損状況：${o.b_damage||''}
+氏　　名：${o.b_name||''}／年齢：${o.b_age||''}／住所：${o.b_addr||''}
+${o.reportType==='property' ? `種別：${o.b_type||''}\n` : ''}同乗者名：${o.b_pass||''}／車名：${o.b_car||''}／破損：${o.b_damage||''}
+区分：${o.b_role||''}${o.b_role==='同乗者'&&o.b_seat?`（${o.b_seat}）`:''}
+怪我：${o.b_injury||''}　搬送：${o.b_trans_method||''}／搬送先：${o.b_trans_hospital||''}
 ${o.reportType==='property' ? `申し立て：${o.b_stmt||''}` : `供述調書：${o.b_stmt||''}`}
 `;
-
-    return `${baseTop}\n${injBlock}${partyA}\n${partyB}`;
+    const jikkou = (o.reportType==='property') ? '' :
+`\n【実況見分調書】\n${o.jikkou||'本職撮影の写真若干枚および見分図面を添付する。'}\n`;
+    return `${head}\n${partyA}\n${partyB}${jikkou}`;
   }
   async function copyMD(){ const md=toMarkdown(toObj()); try{ await navigator.clipboard.writeText(md); alert('Markdownをコピーしました'); }catch{ alert('コピーできませんでした'); } }
 
@@ -357,14 +356,15 @@ ${o.reportType==='property' ? `申し立て：${o.b_stmt||''}` : `供述調書�
         <div class="g-12">所属氏名：${esc(o.affName)}／見 分 官：${esc(o.inspector)}／補 助 者：${esc(o.assistant)}</div>
         <div class="g-12">通報：${esc(formatDT(o.tReport))}　見分：${esc(formatDT(o.tStart))}〜${esc(formatDT(o.tEnd))}　発生：${esc(formatDT(o.tOccur))}</div>
         <div class="g-12">場所：${esc(o.place)}　道路：${esc(o.roadType)}　形態：${esc(o.accTypeFinal)}</div>
+        <div class="g-12"><strong>【第一当事者】</strong>
+          区分：${esc(o.a_role)}${o.a_role==='同乗者'&&o.a_seat?'（'+esc(o.a_seat)+'）':''} ／ 怪我：${esc(o.a_injury)} ／ 搬送：${esc(o.a_trans_method)}／${esc(o.a_trans_hospital)}
+        </div>
+        <div class="g-12"><strong>【第二当事者】</strong>
+          区分：${esc(o.b_role)}${o.b_role==='同乗者'&&o.b_seat?'（'+esc(o.b_seat)+'）':''} ／ 怪我：${esc(o.b_injury)} ／ 搬送：${esc(o.b_trans_method)}／${esc(o.b_trans_hospital)}
+        </div>
         ${ o.reportType==='property' ? '' : `
-          <div class="g-12"><strong>【負傷者】</strong>　１．区分：${esc(o.inj1_role)}${o.inj1_role==='同乗者' && o.inj1_seat? '（'+esc(o.inj1_seat)+'）':''} ／ 怪我：${esc(o.inj1_degree)}　
-          ｜　２．第一当事者／怪我：${esc(o.inj2_degree)}　
-          ｜　搬送（共通）：${esc(o.trans_method)}／搬送先：${esc(o.trans_hospital)}</div>
-          <div class="g-12"><strong>【実況見分調書】</strong><br>${nl2br(esc(o.jikkou||'本件交通事故の状況を明らかにするため、本職が撮影した写真　枚及び見分結果の図面を添付する。'))}</div>
+          <div class="g-12"><strong>【実況見分調書】</strong><br>${nl2br(esc(o.jikkou||'本職撮影の写真若干枚および見分図面を添付する。'))}</div>
         `}
-        <div class="g-12"><strong>【第一当事者】</strong>　氏名：${esc(o.a_name)}／年齢：${esc(o.a_age)}／住所：${esc(o.a_addr)}／${o.reportType==='property' ? '種別：'+esc(o.a_type)+'／' : ''}同乗者：${esc(o.a_pass)}／車名：${esc(o.a_car)}／破損：${esc(o.a_damage)}／${o.reportType==='property' ? '申し立て' : '供述'}：${esc(o.a_stmt)}</div>
-        <div class="g-12"><strong>【第二当事者】</strong>　氏名：${esc(o.b_name)}／年齢：${esc(o.b_age)}／住所：${esc(o.b_addr)}／${o.reportType==='property' ? '種別：'+esc(o.b_type)+'／' : ''}同乗者：${esc(o.b_pass)}／車名：${esc(o.b_car)}／破損：${esc(o.b_damage)}／${o.reportType==='property' ? '申し立て' : '供述'}：${esc(o.b_stmt)}</div>
         <div class="g-12"><strong>画像</strong></div>
         <div class="g-12">${imgHtml || '<span class="help">（画像なし）</span>'}</div>
       </div>`;
@@ -414,13 +414,63 @@ ${o.reportType==='property' ? `申し立て：${o.b_stmt||''}` : `供述調書�
   // 種別切替
   function toggleByType(){
     const t=$('#reportType').value;
-    $('#injuryBlock').style.display = (t==='injury')?'block':'none';
     $('#a_type_wrap').style.display = (t==='property')?'block':'none';
     $('#b_type_wrap').style.display = (t==='property')?'block':'none';
     $('#a_stmt_label').textContent = t==='property' ? '申し立て（物件）' : '供述調書（人身）';
     $('#b_stmt_label').textContent = t==='property' ? '申し立て（物件）' : '供述調書（人身）';
     $('#jikkouNote').style.display = (t==='injury')?'block':'none';
   }
+
+  // 記入例
+  const demos = {
+    injuryRear: ()=>({
+      reportType:'injury',
+      affName:'響野署 交通課／岩松 太郎', inspector:'三条', assistant:'北村',
+      tReport:isoNow(-30), tStart:isoNow(-10), tEnd:'', tOccur:isoNow(-35),
+      place:'響野市駅前2丁目 市道3号 南行 〇〇前', roadType:'市道',
+      accType:'追突', accTypeOther:'', accDetail:'B車が赤信号で停止中、後方A車が追突。B後部損傷小。破片散乱少量。',
+      a_role:'運転手', a_seat:'', a_injury_sel:'不明／申告のみ', a_trans_method:'なし', a_trans_hospital:'',
+      b_role:'同乗者', b_seat:'後席右', b_injury_sel:'軽傷（擦過・軽打撲 等）', b_trans_method:'救急搬送', b_trans_hospital:'〇〇総合',
+      a_name:'山田 太郎', a_age:'38', a_addr:'響野市〇〇1-2-3', a_type:'', a_pass:'1名', a_car:'普通乗用', a_damage:'前部軽損', a_stmt:'前車が停止しており追突',
+      b_name:'佐藤 花子', b_age:'41', b_addr:'響野市△△4-5-6', b_type:'', b_pass:'0名', b_car:'軽乗用', b_damage:'後部バンパー割れ', b_stmt:'停止中に追突された',
+      jikkou:'写真 6 枚および見分図を添付する。'
+    }),
+    injuryDoorBike: ()=>({
+      reportType:'injury', affName:'響野署 交通課／岩松 太郎', inspector:'三条', assistant:'北村',
+      tReport:isoNow(-25), tStart:isoNow(-10), tEnd:'', tOccur:isoNow(-27),
+      place:'響野市中央1丁目 県道12号 西側路肩', roadType:'県道',
+      accType:'ドア開放', accTypeOther:'', accDetail:'路肩停車A車が左後席ドア開放、直進自転車Bが接触転倒。',
+      a_role:'運転手', a_seat:'', a_injury_sel:'中等傷（打撲・挫傷で要治療）', a_trans_method:'自己受診', a_trans_hospital:'△△クリニック',
+      b_role:'自転車運転者', b_seat:'', b_injury_sel:'軽傷（擦過・軽打撲 等）', b_trans_method:'自己受診', b_trans_hospital:'□□整形外科',
+      a_name:'黒川 悠', a_age:'29', a_addr:'響野市桜町2-7-1', a_pass:'—', a_car:'普通乗用', a_damage:'左後ドア小傷', a_stmt:'安全確認不足',
+      b_name:'B（男性）', b_age:'22', b_addr:'響野市北町3-2-2', b_pass:'—', b_car:'—', b_damage:'前輪リム歪み', b_stmt:'左側通過中に開扉',
+      jikkou:'写真 4 枚を添付。'
+    }),
+    propertyHitRun: ()=>({
+      reportType:'property', affName:'響野署 交通課／岩松 太郎', inspector:'三条', assistant:'—',
+      tReport:isoNow(-60), tStart:isoNow(-40), tEnd:isoNow(-20), tOccur:'',
+      place:'響野市中央1-2-3 商業施設駐車場', roadType:'その他',
+      accType:'当て逃げ', accTypeOther:'', accDetail:'駐車中C車右後部擦過。黒色塗膜片付着。カメラ写り込みあり。',
+      a_role:'運転手', a_injury_sel:'', a_trans_method:'なし',
+      b_role:'運転手', b_injury_sel:'', b_trans_method:'なし',
+      a_name:'被害者 C', a_pass:'—', a_car:'普通乗用', a_damage:'右後部擦過', a_stmt:'駐車中に傷を確認',
+      b_name:'相手不詳', b_car:'黒色セダンか', b_damage:'—', b_stmt:'—',
+      jikkou:'（物件のため略）'
+    })
+  };
+  function isoNow(minOffset=0){
+    const d=new Date(Date.now()+minOffset*60000 - (new Date()).getTimezoneOffset()*60000);
+    return d.toISOString().slice(0,16);
+  }
+  function applyDemo(key){ const t=demos[key]?.(); if(!t) return; Object.keys(t).forEach(k=>{ if($('#'+k)) $('#'+k).value=t[k]; });
+    toggleByType(); toggleAccOther(); toggleSeat(); toggleInjuryOther(); alert('記入例を適用しました');}
+  function applyRandom(){ const ks=Object.keys(demos); applyDemo(ks[Math.floor(Math.random()*ks.length)]); }
+  function clearDemo(){
+    ['accDetail','jikkou','a_stmt','b_stmt','a_injury_sel','b_injury_sel','a_injury_other','b_injury_other','a_trans_hospital','b_trans_hospital','a_seat','b_seat'].forEach(id=>{ if($('#'+id)) $('#'+id).value='';});
+    ['a_trans_method','b_trans_method'].forEach(id=>{ if($('#'+id)) $('#'+id).value='なし';});
+  }
+
+  async function copyMD(){ const md=toMarkdown(toObj()); try{ await navigator.clipboard.writeText(md); alert('Markdownをコピーしました'); }catch{ alert('コピーできませんでした'); } }
 
   // イベント
   $('#btnPreview').addEventListener('click',()=>renderPreview(toObj()));
@@ -431,12 +481,46 @@ ${o.reportType==='property' ? `申し立て：${o.b_stmt||''}` : `供述調書�
   $('#btnPNG').addEventListener('click',exportPNG);
   $('#reportType').addEventListener('change',toggleByType);
   $('#accType').addEventListener('change',toggleAccOther);
-  $('#inj1_degree_sel').addEventListener('change',toggleInjuryOther);
-  $('#inj2_degree_sel').addEventListener('change',toggleInjuryOther);
-  $('#inj1_role').addEventListener('change',toggleSeat);
+  $('#a_role').addEventListener('change',toggleSeat);
+  $('#b_role').addEventListener('change',toggleSeat);
+  $('#a_injury_sel').addEventListener('change',toggleInjuryOther);
+  $('#b_injury_sel').addEventListener('change',toggleInjuryOther);
+  $('#btnDemoApply').addEventListener('click',()=>applyDemo($('#demoSelect').value));
+  $('#btnDemoRandom').addEventListener('click',applyRandom);
+  $('#btnDemoClear').addEventListener('click',clearDemo);
+
+  // 画像ヘルパ類（前述）
+  function persistImages(){ localStorage.setItem(IMGKEY, JSON.stringify(images)); }
+  function loadImages(){ try{ const arr=JSON.parse(localStorage.getItem(IMGKEY)||'[]'); if(Array.isArray(arr)) images=arr; }catch{} }
+  const drop=$('#drop'), fileInput=$('#fileInput'), thumbs=$('#thumbs');
+  function renderThumbs(){ thumbs.innerHTML=''; images.forEach((im,idx)=>{ const d=document.createElement('div'); d.className='thumb';
+    d.innerHTML=`<img src="${im.src}"><div class="cap"><input type="text" placeholder="キャプション（任意）" value="${(im.caption||'').replace(/"/g,'&quot;')}"></div>
+      <div class="tools"><div class="row"><button data-a="up">↑</button><button data-a="down">↓</button><button data-a="del" class="warn">削除</button></div></div>`;
+    d.querySelector('input').addEventListener('change',e=>{ images[idx].caption=e.target.value; persistImages(); });
+    d.querySelector('[data-a="up"]').addEventListener('click',()=>{ if(idx===0)return; [images[idx-1],images[idx]]=[images[idx],images[idx-1]]; persistImages(); renderThumbs(); });
+    d.querySelector('[data-a="down"]').addEventListener('click',()=>{ if(idx===images.length-1)return; [images[idx+1],images[idx]]=[images[idx],images[idx+1]]; persistImages(); renderThumbs(); });
+    d.querySelector('[data-a="del"]').addEventListener('click',()=>{ images.splice(idx,1); persistImages(); renderThumbs(); });
+    thumbs.appendChild(d);
+  });}
+  function resizeToDataURL(file,maxEdge){
+    return new Promise((res,rej)=>{
+      const fr=new FileReader();
+      fr.onload=()=>{ const img=new Image(); img.onload=()=>{
+        const w=img.width, h=img.height, sc=Math.min(1, maxEdge/Math.max(w,h));
+        const nw=Math.round(w*sc), nh=Math.round(h*sc);
+        const cv=document.createElement('canvas'); cv.width=nw; cv.height=nh;
+        cv.getContext('2d').drawImage(img,0,0,nw,nh);
+        res(cv.toDataURL('image/jpeg',0.9));
+      }; img.onerror=rej; img.src=fr.result; }; fr.onerror=rej; fr.readAsDataURL(file);
+    });
+  }
+  ['dragenter','dragover'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.style.background='rgba(80,120,255,.1)';}));
+  ['dragleave','drop'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.style.background='transparent';}));
+  drop.addEventListener('drop', e=>{ e.preventDefault(); const fs=[...(e.dataTransfer?.files||[])].filter(f=>f.type.startsWith('image/')); fs.forEach(async f=>{ const d=await resizeToDataURL(f,1600); images.push({src:d,name:f.name,caption:''}); persistImages(); renderThumbs(); }); });
+  fileInput.addEventListener('change', e=>{ const fs=[...(e.target.files||[])].filter(f=>f.type.startsWith('image/')); fs.forEach(async f=>{ const d=await resizeToDataURL(f,1600); images.push({src:d,name:f.name,caption:''}); persistImages(); renderThumbs(); }); fileInput.value=''; });
 
   // 初期化
-  setDocId(); toggleByType(); toggleAccOther(); toggleInjuryOther(); toggleSeat();
+  setDocId(); toggleByType(); toggleAccOther(); toggleSeat(); toggleInjuryOther();
   loadImages(); renderThumbs();
 </script>
 </body>
