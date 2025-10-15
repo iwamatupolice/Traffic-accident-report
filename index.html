@@ -97,16 +97,26 @@
     </div>
   </div>
 
-  <!-- 人身：負傷者（拡張） -->
+  <!-- 人身：負傷者（修正） -->
   <div class="card" id="injuryBlock">
     <div class="grid">
       <div class="g-12"><strong>【負傷者】</strong></div>
 
+      <!-- 1人目 -->
       <div class="g-6">
-        <label>１．第 当事者の［運転手・同乗者（ に乗車）］</label>
+        <label>１．第当事者の区分</label>
         <div class="row">
-          <select id="inj1_role"><option>運転手</option><option>同乗者</option></select>
-          <input id="inj1_seat" placeholder="同乗者：前席／後席右 など" />
+          <select id="inj1_role">
+            <option>運転手</option>
+            <option>同乗者</option>
+            <option>歩行者</option>
+            <option>自転車運転者</option>
+            <option>自転車同乗者</option>
+            <option>二輪運転者</option>
+            <option>二輪同乗者</option>
+            <option>その他</option>
+          </select>
+          <input id="inj1_seat" placeholder="同乗者の場合：前席／後席右 など" style="display:none;flex:1 1 220px"/>
         </div>
         <label style="margin-top:8px">怪我の程度</label>
         <div class="row">
@@ -121,18 +131,11 @@
           </select>
           <input id="inj1_degree_other" placeholder="その他の具体（任意）" style="display:none;flex:1 1 220px">
         </div>
-        <div class="row" style="margin-top:8px">
-          <label>搬送</label>
-          <select id="inj1_transport">
-            <option>なし</option><option>自己受診</option><option>救急搬送</option><option>ドクターヘリ</option>
-          </select>
-          <input id="inj1_hospital" placeholder="搬送先（任意）" style="flex:1 1 220px">
-        </div>
       </div>
 
+      <!-- 2人目（第一当事者） -->
       <div class="g-6">
-        <label>２．第一 当事者</label>
-        <label style="margin-top:8px">怪我の程度</label>
+        <label>２．第一当事者の怪我の程度</label>
         <div class="row">
           <select id="inj2_degree_sel">
             <option value="">（選択）</option>
@@ -145,12 +148,16 @@
           </select>
           <input id="inj2_degree_other" placeholder="その他の具体（任意）" style="display:none;flex:1 1 220px">
         </div>
-        <div class="row" style="margin-top:8px">
-          <label>搬送</label>
-          <select id="inj2_transport">
+      </div>
+
+      <!-- 共通の搬送欄（1つだけ） -->
+      <div class="g-12">
+        <label>搬送（共通）</label>
+        <div class="row">
+          <select id="trans_method">
             <option>なし</option><option>自己受診</option><option>救急搬送</option><option>ドクターヘリ</option>
           </select>
-          <input id="inj2_hospital" placeholder="搬送先（任意）" style="flex:1 1 220px">
+          <input id="trans_hospital" placeholder="搬送先（任意）" style="flex:1 1 300px">
         </div>
       </div>
     </div>
@@ -213,7 +220,7 @@
     </div>
   </div>
 
-  <!-- 操作（記入例システム付き） -->
+  <!-- 操作 -->
   <div class="card no-print">
     <div class="btns">
       <button class="primary" id="btnPreview">プレビュー/印刷</button>
@@ -222,16 +229,6 @@
       <button id="btnJSON">JSONを書き出し</button>
       <button id="btnMD">Markdownをコピー</button>
       <button id="btnPNG">PNGを書き出し</button>
-      <span class="hr" style="width:1px; height:28px"></span>
-      <label class="help">記入例：</label>
-      <select id="demoSelect">
-        <option value="injuryRear">人身：追突（軽傷）</option>
-        <option value="injuryDoorBike">人身：ドア開放×自転車（中等傷）</option>
-        <option value="propertyHitRun">物件：当て逃げ（駐車場）</option>
-      </select>
-      <button id="btnDemoApply">適用</button>
-      <button id="btnDemoRandom">ランダム</button>
-      <button id="btnDemoClear">例をクリア</button>
     </div>
   </div>
 
@@ -245,13 +242,14 @@
   const $ = (q)=>document.querySelector(q);
   const FIELDS = [
     'reportType','affName','inspector','assistant','tReport','tStart','tEnd','tOccur','place','roadType','accType','accTypeOther','accDetail',
-    'inj1_role','inj1_seat','inj1_degree_sel','inj1_degree_other','inj1_transport','inj1_hospital',
-    'inj2_degree_sel','inj2_degree_other','inj2_transport','inj2_hospital',
+    'inj1_role','inj1_seat','inj1_degree_sel','inj1_degree_other',
+    'inj2_degree_sel','inj2_degree_other',
+    'trans_method','trans_hospital',
     'a_name','a_age','a_addr','a_type','a_pass','a_car','a_damage','a_stmt',
     'b_name','b_age','b_addr','b_type','b_pass','b_car','b_damage','b_stmt',
     'jikkou'
   ];
-  const LSKEY='iwamatsu_accident_report_v3';
+  const LSKEY='iwamatsu_accident_report_v4';
   const IMGKEY='iwamatsu_accident_images_v1';
   let images=[];
 
@@ -261,20 +259,17 @@
   function esc(s){ return String(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
   function nl2br(s){ return String(s||'').replace(/\n/g,'<br>'); }
 
-  // 事故形態：その他入力欄の表示切替
-  function toggleAccOther(){
-    $('#accTypeOther').style.display = ($('#accType').value==='その他') ? 'block' : 'none';
-  }
-  // 負傷：その他自由記載の表示切替
+  // 表示切替
+  function toggleAccOther(){ $('#accTypeOther').style.display = ($('#accType').value==='その他') ? 'block' : 'none'; }
   function toggleInjuryOther(){
     $('#inj1_degree_other').style.display = ($('#inj1_degree_sel').value==='その他') ? 'block' : 'none';
     $('#inj2_degree_other').style.display = ($('#inj2_degree_sel').value==='その他') ? 'block' : 'none';
   }
-  function injuryText(sel, other){
-    const v = (sel||'').trim();
-    if(v==='その他') return (other||'').trim();
-    return v||'';
+  function toggleSeat(){
+    const show = $('#inj1_role').value==='同乗者';
+    $('#inj1_seat').style.display = show ? 'block' : 'none';
   }
+  function injuryText(sel, other){ const v=(sel||'').trim(); return (v==='その他')?(other||'').trim():v||''; }
 
   function toObj(){
     const o={}; FIELDS.forEach(k=>{ const el=$('#'+k); o[k]=el?.value??''; });
@@ -287,7 +282,7 @@
   function applyObj(o){
     FIELDS.forEach(k=>{ if($('#'+k)) $('#'+k).value=o[k]??''; });
     images=Array.isArray(o.images)?o.images:[];
-    toggleByType(); toggleAccOther(); toggleInjuryOther(); renderThumbs();
+    toggleByType(); toggleAccOther(); toggleInjuryOther(); toggleSeat(); renderThumbs();
   }
   function saveDraft(){ localStorage.setItem(LSKEY, JSON.stringify(toObj())); alert('下書きを保存しました'); }
   function loadDraft(){ const raw=localStorage.getItem(LSKEY); if(!raw) return alert('保存はありません'); const o=JSON.parse(raw); applyObj(o); $('#docId').textContent='ID: '+(o.docId||genId()); alert('読み込みました'); }
@@ -296,30 +291,55 @@
   function toMarkdown(o){
     const type = o.reportType==='property' ? '物件交通事故報告書' : '人身交通事故報告書';
     const baseTop =
-      `${type}（${o.docId}）\n\n`+
-      `所属氏名：${o.affName||''}\n見  分  官：${o.inspector||''}\n補  助  者：${o.assistant||''}\n\n`+
-      `通報時間：${formatDT(o.tReport)}\n見分開始：${formatDT(o.tStart)}\n見分終了：${formatDT(o.tEnd)}\n発生時間：${formatDT(o.tOccur)}\n`+
-      `発生場所：${o.place||''}\n道路種別：${o.roadType||''}\n事故形態：${o.accTypeFinal||''}\n事故状況：${o.accDetail||''}\n\n`;
+`# ${type}（${o.docId}）\n
+所属氏名：${o.affName||''}
+見  分  官：${o.inspector||''}
+補  助  者：${o.assistant||''}
+
+通報時間：${formatDT(o.tReport)}
+見分開始：${formatDT(o.tStart)}
+見分終了：${formatDT(o.tEnd)}
+発生時間：${formatDT(o.tOccur)}
+発生場所：${o.place||''}
+道路種別：${o.roadType||''}
+事故形態：${o.accTypeFinal||''}
+事故状況：${o.accDetail||''}
+`;
 
     const injBlock = (o.reportType==='property') ? '' :
-      `【負傷者】\n１．第　当事者［${o.inj1_role||''}${o.inj1_role==='同乗者' ? '（'+(o.inj1_seat||'')+' に乗車）' : ''}］\n`+
-      `　怪我の程度（${o.inj1_degree||''}／搬送：${o.inj1_transport||''}／搬送先：${o.inj1_hospital||''}）\n`+
-      `２．第一　当事者\n　怪我の程度（${o.inj2_degree||''}／搬送：${o.inj2_transport||''}／搬送先：${o.inj2_hospital||''}）\n\n`+
-      `【実況見分調書】\n${o.jikkou||'本件交通事故の状況を明らかにするため、本職が撮影した写真　枚及び見分結果の図面を添付する。'}\n`;
+`【負傷者】
+１．第当事者の区分：${o.inj1_role||''}${o.inj1_role==='同乗者' && o.inj1_seat?`（${o.inj1_seat}）`:''}
+　怪我の程度（${o.inj1_degree||''}）
+２．第一当事者の怪我の程度（${o.inj2_degree||''}）
+搬送（共通）：${o.trans_method||''}／搬送先：${o.trans_hospital||''}
+
+【実況見分調書】
+${o.jikkou||'本件交通事故の状況を明らかにするため、本職が撮影した写真　枚及び見分結果の図面を添付する。'}
+`;
 
     const partyA =
-      `【第一当事者】\n氏　　名：${o.a_name||''}\n年　　齢：${o.a_age||''}\n住　　所：${o.a_addr||''}\n`+
-      (o.reportType==='property' ? `種　　別：${o.a_type||''}\n` : '')+
-      `同乗者名：${o.a_pass||''}\n車　　名：${o.a_car||''}\n破損状況：${o.a_damage||''}\n`+
-      (o.reportType==='property' ? `申し立て：${o.a_stmt||''}\n` : `供述調書：${o.a_stmt||''}\n`);
+`【第一当事者】
+氏　　名：${o.a_name||''}
+年　　齢：${o.a_age||''}
+住　　所：${o.a_addr||''}
+${o.reportType==='property' ? `種　　別：${o.a_type||''}\n` : ''}同乗者名：${o.a_pass||''}
+車　　名：${o.a_car||''}
+破損状況：${o.a_damage||''}
+${o.reportType==='property' ? `申し立て：${o.a_stmt||''}` : `供述調書：${o.a_stmt||''}`}
+`;
 
     const partyB =
-      `【第二当事者】\n氏　　名：${o.b_name||''}\n年　　齢：${o.b_age||''}\n住　　所：${o.b_addr||''}\n`+
-      (o.reportType==='property' ? `種　　別：${o.b_type||''}\n` : '')+
-      `同乗者名：${o.b_pass||''}\n車　　名：${o.b_car||''}\n破損状況：${o.b_damage||''}\n`+
-      (o.reportType==='property' ? `申し立て：${o.b_stmt||''}\n` : `供述調書：${o.b_stmt||''}\n`);
+`【第二当事者】
+氏　　名：${o.b_name||''}
+年　　齢：${o.b_age||''}
+住　　所：${o.b_addr||''}
+${o.reportType==='property' ? `種　　別：${o.b_type||''}\n` : ''}同乗者名：${o.b_pass||''}
+車　　名：${o.b_car||''}
+破損状況：${o.b_damage||''}
+${o.reportType==='property' ? `申し立て：${o.b_stmt||''}` : `供述調書：${o.b_stmt||''}`}
+`;
 
-    return `# ${baseTop}${injBlock}${partyA}\n${partyB}`;
+    return `${baseTop}\n${injBlock}${partyA}\n${partyB}`;
   }
   async function copyMD(){ const md=toMarkdown(toObj()); try{ await navigator.clipboard.writeText(md); alert('Markdownをコピーしました'); }catch{ alert('コピーできませんでした'); } }
 
@@ -337,10 +357,10 @@
         <div class="g-12">所属氏名：${esc(o.affName)}／見 分 官：${esc(o.inspector)}／補 助 者：${esc(o.assistant)}</div>
         <div class="g-12">通報：${esc(formatDT(o.tReport))}　見分：${esc(formatDT(o.tStart))}〜${esc(formatDT(o.tEnd))}　発生：${esc(formatDT(o.tOccur))}</div>
         <div class="g-12">場所：${esc(o.place)}　道路：${esc(o.roadType)}　形態：${esc(o.accTypeFinal)}</div>
-        <div class="g-12">事故状況：${nl2br(esc(o.accDetail))}</div>
         ${ o.reportType==='property' ? '' : `
-          <div class="g-12"><strong>【負傷者】</strong>　１．第 当事者［${esc(o.inj1_role)}${o.inj1_role==='同乗者'?'（'+esc(o.inj1_seat)+' に乗車）':''}］／怪我：${esc(o.inj1_degree)}／搬送：${esc(o.inj1_transport)}／搬送先：${esc(o.inj1_hospital)}</div>
-          <div class="g-12">２．第一 当事者／怪我：${esc(o.inj2_degree)}／搬送：${esc(o.inj2_transport)}／搬送先：${esc(o.inj2_hospital)}</div>
+          <div class="g-12"><strong>【負傷者】</strong>　１．区分：${esc(o.inj1_role)}${o.inj1_role==='同乗者' && o.inj1_seat? '（'+esc(o.inj1_seat)+'）':''} ／ 怪我：${esc(o.inj1_degree)}　
+          ｜　２．第一当事者／怪我：${esc(o.inj2_degree)}　
+          ｜　搬送（共通）：${esc(o.trans_method)}／搬送先：${esc(o.trans_hospital)}</div>
           <div class="g-12"><strong>【実況見分調書】</strong><br>${nl2br(esc(o.jikkou||'本件交通事故の状況を明らかにするため、本職が撮影した写真　枚及び見分結果の図面を添付する。'))}</div>
         `}
         <div class="g-12"><strong>【第一当事者】</strong>　氏名：${esc(o.a_name)}／年齢：${esc(o.a_age)}／住所：${esc(o.a_addr)}／${o.reportType==='property' ? '種別：'+esc(o.a_type)+'／' : ''}同乗者：${esc(o.a_pass)}／車名：${esc(o.a_car)}／破損：${esc(o.a_damage)}／${o.reportType==='property' ? '申し立て' : '供述'}：${esc(o.a_stmt)}</div>
@@ -353,19 +373,15 @@
 
   // 画像
   const drop=$('#drop'), fileInput=$('#fileInput'), thumbs=$('#thumbs');
-  function renderThumbs(){
-    thumbs.innerHTML='';
-    images.forEach((im,idx)=>{
-      const d=document.createElement('div'); d.className='thumb';
-      d.innerHTML=`<img src="${im.src}"><div class="cap"><input type="text" placeholder="キャプション（任意）" value="${(im.caption||'').replace(/"/g,'&quot;')}"></div>
+  function renderThumbs(){ thumbs.innerHTML=''; images.forEach((im,idx)=>{ const d=document.createElement('div'); d.className='thumb';
+    d.innerHTML=`<img src="${im.src}"><div class="cap"><input type="text" placeholder="キャプション（任意）" value="${(im.caption||'').replace(/"/g,'&quot;')}"></div>
       <div class="tools"><div class="row"><button data-a="up">↑</button><button data-a="down">↓</button><button data-a="del" class="warn">削除</button></div></div>`;
-      d.querySelector('input').addEventListener('change',e=>{ images[idx].caption=e.target.value; persistImages(); });
-      d.querySelector('[data-a="up"]').addEventListener('click',()=>{ if(idx===0)return; [images[idx-1],images[idx]]=[images[idx],images[idx-1]]; persistImages(); renderThumbs(); });
-      d.querySelector('[data-a="down"]').addEventListener('click',()=>{ if(idx===images.length-1)return; [images[idx+1],images[idx]]=[images[idx],images[idx+1]]; persistImages(); renderThumbs(); });
-      d.querySelector('[data-a="del"]').addEventListener('click',()=>{ images.splice(idx,1); persistImages(); renderThumbs(); });
-      thumbs.appendChild(d);
-    });
-  }
+    d.querySelector('input').addEventListener('change',e=>{ images[idx].caption=e.target.value; persistImages(); });
+    d.querySelector('[data-a="up"]').addEventListener('click',()=>{ if(idx===0)return; [images[idx-1],images[idx]]=[images[idx],images[idx-1]]; persistImages(); renderThumbs(); });
+    d.querySelector('[data-a="down"]').addEventListener('click',()=>{ if(idx===images.length-1)return; [images[idx+1],images[idx]]=[images[idx],images[idx+1]]; persistImages(); renderThumbs(); });
+    d.querySelector('[data-a="del"]').addEventListener('click',()=>{ images.splice(idx,1); persistImages(); renderThumbs(); });
+    thumbs.appendChild(d);
+  });}
   function persistImages(){ localStorage.setItem(IMGKEY, JSON.stringify(images)); }
   function loadImages(){ try{ const arr=JSON.parse(localStorage.getItem(IMGKEY)||'[]'); if(Array.isArray(arr)) images=arr; }catch{} }
   function resizeToDataURL(file,maxEdge){
@@ -406,69 +422,6 @@
     $('#jikkouNote').style.display = (t==='injury')?'block':'none';
   }
 
-  // —— 記入例（プリセット） —— //
-  const demos = {
-    injuryRear: ()=>({
-      reportType:'injury',
-      affName:'響野署 交通課／岩松 太郎',
-      inspector:'三条', assistant:'北村',
-      tReport:isoNow(-30), tStart:isoNow(-10), tEnd:'', tOccur:isoNow(-35),
-      place:'響野市駅前2丁目 市道3号 南行 〇〇前', roadType:'市道',
-      accType:'追突', accTypeOther:'', accDetail:'信号待ち中のB車にA車が追突。B車後部大破。破片散乱少量。ブレーキ痕なし。',
-      inj1_role:'同乗者', inj1_seat:'後席右', inj1_degree_sel:'軽傷（擦過・軽打撲 等)', inj1_degree_other:'', inj1_transport:'救急搬送', inj1_hospital:'〇〇総合病院',
-      inj2_degree_sel:'不明／申告のみ', inj2_degree_other:'', inj2_transport:'なし', inj2_hospital:'',
-      a_name:'山田 太郎', a_age:'38', a_addr:'響野市〇〇1-2-3', a_type:'', a_pass:'1名', a_car:'普通乗用 セダン', a_damage:'前部バンパー軽度', a_stmt:'前車が急停止したため追突した',
-      b_name:'佐藤 花子', b_age:'41', b_addr:'響野市△△4-5-6', b_type:'', b_pass:'0名', b_car:'軽乗用', b_damage:'後部バンパー割れ', b_stmt:'赤信号で停止中に追突された',
-      jikkou:'本件交通事故の状況を明らかにするため、本職が撮影した写真 6 枚及び見分結果の図面を添付する。'
-    }),
-    injuryDoorBike: ()=>({
-      reportType:'injury',
-      affName:'響野署 交通課／岩松 太郎',
-      inspector:'三条', assistant:'北村',
-      tReport:isoNow(-25), tStart:isoNow(-10), tEnd:'', tOccur:isoNow(-27),
-      place:'響野市中央1丁目 県道12号 西側路肩', roadType:'県道',
-      accType:'ドア開放', accTypeOther:'', accDetail:'A車が路肩停車中に左後席ドア開放、後方から直進の自転車Bが接触転倒。',
-      inj1_role:'運転手', inj1_seat:'', inj1_degree_sel:'中等傷（打撲・挫傷で要治療）', inj1_degree_other:'', inj1_transport:'自己受診', inj1_hospital:'△△クリニック',
-      inj2_degree_sel:'軽傷（擦過・軽打撲 等）', inj2_degree_other:'', inj2_transport:'自己受診', inj2_hospital:'□□整形外科',
-      a_name:'黒川 悠', a_age:'29', a_addr:'響野市桜町2-7-1', a_type:'', a_pass:'—', a_car:'普通乗用 ハッチバック', a_damage:'左後ドア小傷', a_stmt:'安全確認不足でした',
-      b_name:'自転車（男性）', b_age:'22', b_addr:'響野市北町3-2-2', b_type:'', b_pass:'—', b_car:'—', b_damage:'前輪リム歪み', b_stmt:'左側を通過中、突然ドアが開いた',
-      jikkou:'写真 4 枚および見分図を添付する。'
-    }),
-    propertyHitRun: ()=>({
-      reportType:'property',
-      affName:'響野署 交通課／岩松 太郎',
-      inspector:'三条', assistant:'—',
-      tReport:isoNow(-60), tStart:isoNow(-40), tEnd:isoNow(-20), tOccur:'',
-      place:'響野市中央1-2-3 商業施設駐車場', roadType:'その他',
-      accType:'当て逃げ', accTypeOther:'', accDetail:'被害車両Cが駐車中に右後部擦過。黒色塗膜片付着。監視カメラ写り込みあり。',
-      inj1_role:'運転手', inj1_seat:'', inj1_degree_sel:'', inj1_degree_other:'', inj1_transport:'なし', inj1_hospital:'',
-      inj2_degree_sel:'', inj2_degree_other:'', inj2_transport:'なし', inj2_hospital:'',
-      a_name:'被害者 C', a_age:'', a_addr:'—', a_type:'—', a_pass:'—', a_car:'普通乗用', a_damage:'右後部擦過', a_stmt:'駐車中。戻ったら傷に気付いた',
-      b_name:'相手不詳', b_age:'', b_addr:'—', b_type:'—', b_pass:'—', b_car:'黒色セダンか', b_damage:'—', b_stmt:'—',
-      jikkou:'（物件のため略）'
-    })
-  };
-  function isoNow(minOffset=0){
-    const d=new Date(Date.now()+minOffset*60000 - (new Date()).getTimezoneOffset()*60000);
-    return d.toISOString().slice(0,16);
-  }
-  function applyDemo(key){ const t=demos[key]?.(); if(!t) return;
-    // 画像はクリア
-    images=[]; persistImages(); renderThumbs();
-    // フィールド
-    Object.keys(t).forEach(k=>{ if($('#'+k)) $('#'+k).value = t[k]; });
-    toggleByType(); toggleAccOther(); toggleInjuryOther();
-    alert('記入例を適用しました');
-  }
-  function applyRandom(){ const ks=Object.keys(demos); applyDemo(ks[Math.floor(Math.random()*ks.length)]); }
-  function clearDemo(){
-    ['accDetail','jikkou','a_stmt','b_stmt'].forEach(id=> $('#'+id).value='');
-    ['inj1_degree_sel','inj2_degree_sel'].forEach(id=> $('#'+id).value='');
-    ['inj1_degree_other','inj2_degree_other','inj1_hospital','inj2_hospital','inj1_seat'].forEach(id=> $('#'+id).value='');
-    ['inj1_transport','inj2_transport'].forEach(id=> $('#'+id).value='なし');
-    images=[]; persistImages(); renderThumbs();
-  }
-
   // イベント
   $('#btnPreview').addEventListener('click',()=>renderPreview(toObj()));
   $('#btnSave').addEventListener('click',saveDraft);
@@ -480,12 +433,10 @@
   $('#accType').addEventListener('change',toggleAccOther);
   $('#inj1_degree_sel').addEventListener('change',toggleInjuryOther);
   $('#inj2_degree_sel').addEventListener('change',toggleInjuryOther);
-  $('#btnDemoApply').addEventListener('click',()=>applyDemo($('#demoSelect').value));
-  $('#btnDemoRandom').addEventListener('click',applyRandom);
-  $('#btnDemoClear').addEventListener('click',clearDemo);
+  $('#inj1_role').addEventListener('change',toggleSeat);
 
   // 初期化
-  setDocId(); toggleByType(); toggleAccOther(); toggleInjuryOther();
+  setDocId(); toggleByType(); toggleAccOther(); toggleInjuryOther(); toggleSeat();
   loadImages(); renderThumbs();
 </script>
 </body>
