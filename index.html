@@ -113,7 +113,6 @@
       <div class="g-4"><label>破損状況</label><input id="a_damage"></div>
       <div class="g-8"><label id="a_stmt_label">供述調書（人身）／申し立て（物件）</label><textarea id="a_stmt"></textarea></div>
 
-      <!-- ←ここに負傷情報（第一当事者専用） -->
       <div class="g-4"><label>区　　分</label>
         <div class="row">
           <select id="a_role">
@@ -163,7 +162,6 @@
       <div class="g-4"><label>破損状況</label><input id="b_damage"></div>
       <div class="g-8"><label id="b_stmt_label">供述調書（人身）／申し立て（物件）</label><textarea id="b_stmt"></textarea></div>
 
-      <!-- ←ここに負傷情報（第二当事者専用） -->
       <div class="g-4"><label>区　　分</label>
         <div class="row">
           <select id="b_role">
@@ -253,13 +251,10 @@
   const $ = (q)=>document.querySelector(q);
   const FIELDS = [
     'reportType','affName','inspector','assistant','tReport','tStart','tEnd','tOccur','place','roadType','accType','accTypeOther','accDetail',
-    // 第一当事者
     'a_name','a_age','a_addr','a_type','a_pass','a_car','a_damage','a_stmt',
     'a_role','a_seat','a_injury_sel','a_injury_other','a_trans_method','a_trans_hospital',
-    // 第二当事者
     'b_name','b_age','b_addr','b_type','b_pass','b_car','b_damage','b_stmt',
     'b_role','b_seat','b_injury_sel','b_injury_other','b_trans_method','b_trans_hospital',
-    // 見分メモ
     'jikkou'
   ];
   const LSKEY='iwamatsu_accident_report_v6';
@@ -272,7 +267,7 @@
   function esc(s){ return String(s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
   function nl2br(s){ return String(s||'').replace(/\n/g,'<br>'); }
 
-  // 表示切り替え
+  // 表示切替
   function toggleAccOther(){ $('#accTypeOther').style.display = ($('#accType').value==='その他') ? 'block' : 'none'; }
   function toggleSeat(){
     $('#a_seat').style.display = ($('#a_role').value==='同乗者')?'block':'none';
@@ -287,16 +282,24 @@
   function toObj(){
     const o={}; FIELDS.forEach(k=>{ const el=$('#'+k); o[k]=el?.value??''; });
     o.accTypeFinal = ($('#accType').value==='その他' && o.accTypeOther) ? o.accTypeOther : ($('#accType').value || '');
-    // inj text
     o.a_injury = injuryText(o.a_injury_sel, o.a_injury_other);
     o.b_injury = injuryText(o.b_injury_sel, o.b_injury_other);
     o.docId=$('#docId').textContent.replace('ID: ',''); o.images=images;
     return o;
   }
   function applyObj(o){
-    FIELDS.forEach(k=>{ if($('#'+k)) $('#'+k).value=o[k]??''; });
+    FIELDS.forEach(k=>{ if($('#'+k)) setVal(k, o[k]); });
     images=Array.isArray(o.images)?o.images:[];
-    toggleByType(); toggleAccOther(); toggleSeat(); toggleInjuryOther(); renderThumbs();
+    toggleByType(); renderThumbs();
+  }
+
+  // 値セット＋change発火（ここが修正ポイント）
+  function setVal(id, val){
+    const el = $('#'+id);
+    if(!el) return;
+    el.value = (val ?? '');
+    el.dispatchEvent(new Event('change', {bubbles:true}));
+    el.dispatchEvent(new Event('input', {bubbles:true}));
   }
 
   function saveDraft(){ localStorage.setItem(LSKEY, JSON.stringify(toObj())); alert('下書きを保存しました'); }
@@ -400,7 +403,6 @@ ${o.reportType==='property' ? `申し立て：${o.b_stmt||''}` : `供述調書�
   ['dragleave','drop'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.style.background='transparent';}));
   drop.addEventListener('drop', e=>{ e.preventDefault(); const fs=[...(e.dataTransfer?.files||[])].filter(f=>f.type.startsWith('image/')); fs.forEach(async f=>{ const d=await resizeToDataURL(f,1600); images.push({src:d,name:f.name,caption:''}); persistImages(); renderThumbs(); }); });
   fileInput.addEventListener('change', e=>{ const fs=[...(e.target.files||[])].filter(f=>f.type.startsWith('image/')); fs.forEach(async f=>{ const d=await resizeToDataURL(f,1600); images.push({src:d,name:f.name,caption:''}); persistImages(); renderThumbs(); }); fileInput.value=''; });
-  $('#clearImages').addEventListener('click',()=>{ if(!confirm('画像をすべて削除しますか？')) return; images=[]; persistImages(); renderThumbs(); });
 
   // 出力
   async function exportPNG(){
@@ -421,7 +423,7 @@ ${o.reportType==='property' ? `申し立て：${o.b_stmt||''}` : `供述調書�
     $('#jikkouNote').style.display = (t==='injury')?'block':'none';
   }
 
-  // 記入例
+  // 記入例データ
   const demos = {
     injuryRear: ()=>({
       reportType:'injury',
@@ -462,12 +464,17 @@ ${o.reportType==='property' ? `申し立て：${o.b_stmt||''}` : `供述調書�
     const d=new Date(Date.now()+minOffset*60000 - (new Date()).getTimezoneOffset()*60000);
     return d.toISOString().slice(0,16);
   }
-  function applyDemo(key){ const t=demos[key]?.(); if(!t) return; Object.keys(t).forEach(k=>{ if($('#'+k)) $('#'+k).value=t[k]; });
-    toggleByType(); toggleAccOther(); toggleSeat(); toggleInjuryOther(); alert('記入例を適用しました');}
+  // 記入例を確実に反映（change/input発火）
+  function applyDemo(key){
+    const t=demos[key]?.(); if(!t) return;
+    Object.entries(t).forEach(([k,v])=>{ if($('#'+k)) setVal(k,v); });
+    toggleByType(); renderThumbs();
+    alert('記入例を適用しました');
+  }
   function applyRandom(){ const ks=Object.keys(demos); applyDemo(ks[Math.floor(Math.random()*ks.length)]); }
   function clearDemo(){
-    ['accDetail','jikkou','a_stmt','b_stmt','a_injury_sel','b_injury_sel','a_injury_other','b_injury_other','a_trans_hospital','b_trans_hospital','a_seat','b_seat'].forEach(id=>{ if($('#'+id)) $('#'+id).value='';});
-    ['a_trans_method','b_trans_method'].forEach(id=>{ if($('#'+id)) $('#'+id).value='なし';});
+    ['accDetail','jikkou','a_stmt','b_stmt','a_injury_sel','b_injury_sel','a_injury_other','b_injury_other','a_trans_hospital','b_trans_hospital','a_seat','b_seat'].forEach(id=>{ if($('#'+id)) setVal(id,'');});
+    ['a_trans_method','b_trans_method'].forEach(id=>{ if($('#'+id)) setVal(id,'なし');});
   }
 
   async function copyMD(){ const md=toMarkdown(toObj()); try{ await navigator.clipboard.writeText(md); alert('Markdownをコピーしました'); }catch{ alert('コピーできませんでした'); } }
@@ -489,37 +496,15 @@ ${o.reportType==='property' ? `申し立て：${o.b_stmt||''}` : `供述調書�
   $('#btnDemoRandom').addEventListener('click',applyRandom);
   $('#btnDemoClear').addEventListener('click',clearDemo);
 
-  // 画像ヘルパ類（前述）
-  function persistImages(){ localStorage.setItem(IMGKEY, JSON.stringify(images)); }
-  function loadImages(){ try{ const arr=JSON.parse(localStorage.getItem(IMGKEY)||'[]'); if(Array.isArray(arr)) images=arr; }catch{} }
-  const drop=$('#drop'), fileInput=$('#fileInput'), thumbs=$('#thumbs');
-  function renderThumbs(){ thumbs.innerHTML=''; images.forEach((im,idx)=>{ const d=document.createElement('div'); d.className='thumb';
-    d.innerHTML=`<img src="${im.src}"><div class="cap"><input type="text" placeholder="キャプション（任意）" value="${(im.caption||'').replace(/"/g,'&quot;')}"></div>
-      <div class="tools"><div class="row"><button data-a="up">↑</button><button data-a="down">↓</button><button data-a="del" class="warn">削除</button></div></div>`;
-    d.querySelector('input').addEventListener('change',e=>{ images[idx].caption=e.target.value; persistImages(); });
-    d.querySelector('[data-a="up"]').addEventListener('click',()=>{ if(idx===0)return; [images[idx-1],images[idx]]=[images[idx],images[idx-1]]; persistImages(); renderThumbs(); });
-    d.querySelector('[data-a="down"]').addEventListener('click',()=>{ if(idx===images.length-1)return; [images[idx+1],images[idx]]=[images[idx],images[idx+1]]; persistImages(); renderThumbs(); });
-    d.querySelector('[data-a="del"]').addEventListener('click',()=>{ images.splice(idx,1); persistImages(); renderThumbs(); });
-    thumbs.appendChild(d);
-  });}
-  function resizeToDataURL(file,maxEdge){
-    return new Promise((res,rej)=>{
-      const fr=new FileReader();
-      fr.onload=()=>{ const img=new Image(); img.onload=()=>{
-        const w=img.width, h=img.height, sc=Math.min(1, maxEdge/Math.max(w,h));
-        const nw=Math.round(w*sc), nh=Math.round(h*sc);
-        const cv=document.createElement('canvas'); cv.width=nw; cv.height=nh;
-        cv.getContext('2d').drawImage(img,0,0,nw,nh);
-        res(cv.toDataURL('image/jpeg',0.9));
-      }; img.onerror=rej; img.src=fr.result; }; fr.onerror=rej; fr.readAsDataURL(file);
-    });
-  }
-  ['dragenter','dragover'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.style.background='rgba(80,120,255,.1)';}));
-  ['dragleave','drop'].forEach(ev=> drop.addEventListener(ev, e=>{ e.preventDefault(); drop.style.background='transparent';}));
-  drop.addEventListener('drop', e=>{ e.preventDefault(); const fs=[...(e.dataTransfer?.files||[])].filter(f=>f.type.startsWith('image/')); fs.forEach(async f=>{ const d=await resizeToDataURL(f,1600); images.push({src:d,name:f.name,caption:''}); persistImages(); renderThumbs(); }); });
-  fileInput.addEventListener('change', e=>{ const fs=[...(e.target.files||[])].filter(f=>f.type.startsWith('image/')); fs.forEach(async f=>{ const d=await resizeToDataURL(f,1600); images.push({src:d,name:f.name,caption:''}); persistImages(); renderThumbs(); }); fileInput.value=''; });
-
   // 初期化
+  function toggleByType(){
+    const t=$('#reportType').value;
+    $('#a_type_wrap').style.display = (t==='property')?'block':'none';
+    $('#b_type_wrap').style.display = (t==='property')?'block':'none';
+    $('#a_stmt_label').textContent = t==='property' ? '申し立て（物件）' : '供述調書（人身）';
+    $('#b_stmt_label').textContent = t==='property' ? '申し立て（物件）' : '供述調書（人身）';
+    $('#jikkouNote').style.display = (t==='injury')?'block':'none';
+  }
   setDocId(); toggleByType(); toggleAccOther(); toggleSeat(); toggleInjuryOther();
   loadImages(); renderThumbs();
 </script>
